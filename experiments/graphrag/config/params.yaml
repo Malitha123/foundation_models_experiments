@@ -1,0 +1,100 @@
+# Configuration for Neo4j GraphRAG experiment
+# Edit this file to customize behavior without changing code
+
+# ============================================================================
+# Provider Settings
+# ============================================================================
+provider:
+  # Which provider to use: "openrouter" (recommended) or "openai"
+  # OpenRouter can be used as an OpenAI-compatible provider
+  default: openrouter
+
+  # Model tier to use: "general", "strong", or "reason"
+  tier: general
+
+  # OpenRouter base URL
+  openrouter_base_url: https://openrouter.ai/api/v1
+
+# ============================================================================
+# LLM Defaults
+# ============================================================================
+llm:
+  temperature: 0.0
+  max_tokens: 2000
+  streaming: false
+
+# ============================================================================
+# Embedding Settings
+# ============================================================================
+embedding:
+  # Model tier: "default" (3072d) or "small" (1536d)
+  tier: small
+  batch_size: 100
+  show_progress: false
+
+# ============================================================================
+# Neo4j Graph Database
+# ============================================================================
+graph:
+  # Environment variable names (actual values are in .env)
+  uri_env: NEO4J_URI
+  user_env: NEO4J_USERNAME
+  password_env: NEO4J_PASSWORD
+  database: neo4j
+
+# ============================================================================
+# LLM Entity Extraction (ETL Pipeline)
+# ============================================================================
+extraction:
+  # Use "strong" model (gpt-4o) for higher accuracy extraction
+  model_tier: strong
+  chunk_size: 1000
+  chunk_overlap: 150
+  max_entities_per_chunk: 10
+
+# ============================================================================
+# Graph Retrieval Configuration
+# ============================================================================
+retrieval:
+  # Maximum hops for multi-hop graph traversal
+  max_hops: 2
+  # Number of results to return
+  top_k: 5
+  # Minimum similarity for vector-based operations
+  similarity_threshold: 0.7
+  # Minimum similarity for fuzzy entity matching
+  fuzzy_match_threshold: 0.8
+
+# ============================================================================
+# CRAG Agent Configuration
+# ============================================================================
+agent:
+  # Maximum query rewrite retries before giving up
+  max_retries: 2
+  # Model tier for agent nodes (general = gpt-4o-mini for speed)
+  model_tier: general
+
+# ============================================================================
+# Paths (relative to project root)
+# ============================================================================
+paths:
+  data_dir: data
+  raw_dir: data/raw
+  processed_dir: data/processed
+
+# ============================================================================
+# Logging
+# ============================================================================
+logging:
+  enabled: true
+  level: INFO
+
+# ============================================================================
+# Required Environment Variables
+# ============================================================================
+# These must be set in .env file:
+#   - NEO4J_URI         (Neo4j Aura connection string)
+#   - NEO4J_USERNAME     (Neo4j username, usually "neo4j")
+#   - NEO4J_PASSWORD     (Neo4j password)
+#   - OPENROUTER_API_KEY (if using openrouter provider)
+#   - OPENAI_API_KEY     (if using openai provider directly)

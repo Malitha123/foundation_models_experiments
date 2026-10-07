@@ -1,0 +1,35 @@
+# Neo4j GraphRAG dependencies
+
+# Graph Database
+neo4j>=5.0
+
+# LLM & Embeddings
+langchain>=0.3.0
+langchain-openai>=0.2.0
+langchain-community>=0.3.0
+langchain-text-splitters>=0.3.0
+langgraph>=0.2.0
+openai>=1.0
+
+# Data Validation
+pydantic>=2.0
+
+# Configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# Visualization
+pyvis>=0.3.2
+networkx>=3.0
+
+# Vector Operations (for comparison demo)
+numpy>=1.24
+
+# Utilities
+tqdm>=4.65
+loguru>=0.7
+tiktoken>=0.5
+
+# Notebook
+ipykernel>=6.0
+jupyter>=1.0

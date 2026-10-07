@@ -1,0 +1,48 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model / training outputs
+outputs/
+checkpoints/
+merged_fp16/
+*.gguf
+*.safetensors
+*.bin
+
+# Retrieval artifacts
+artifacts/
+chroma/
+*.sqlite3
+
+# Downloaded datasets
+experiments/multimodal_retrieval/data/*.npz
+experiments/multimodal_retrieval/data/images/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Optional source checkout for GGUF export
+experiments/qlora_finetuning/llama.cpp/
+
+# Local-only review and report files
+AUDIT_REPORT.md
+audit-evidence/
+RESULTS.md
+QA_REPORT.md

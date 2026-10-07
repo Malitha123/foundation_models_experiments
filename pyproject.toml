@@ -1,0 +1,71 @@
+[project]
+name = "foundation-model-genai-experiments"
+version = "0.1.0"
+description = "Independent experiments in QLoRA fine-tuning, multimodal retrieval, and Neo4j GraphRAG"
+authors = [{ name = "Malitha Gunawardhana" }]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+finetuning = [
+  "torch>=2.1,<2.5",
+  "transformers==4.44.2",
+  "huggingface-hub>=0.23,<1",
+  "datasets==2.20.0",
+  "tokenizers==0.19.1",
+  "accelerate==0.34.2",
+  "peft==0.12.0",
+  "trl==0.9.6",
+  "bitsandbytes==0.43.1",
+  "evaluate==0.4.2",
+  "google-genai",
+  "rouge-score",
+  "numpy>=1.24,<2",
+  "pyarrow>=15,<21",
+  "jinja2>=3.1,<4",
+  "pandas",
+  "scikit-learn",
+  "rich",
+  "pyyaml",
+  "tqdm",
+  "python-dotenv>=1.0",
+]
+multimodal = [
+  "torch>=2.0",
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "pillow>=10.0",
+  "matplotlib>=3.7",
+  "sentence-transformers>=2.2",
+  "chromadb>=0.4",
+  "langchain>=0.1",
+  "langchain-core>=0.1",
+  "langchain-openai>=0.0.5",
+  "langchain-community>=0.0.20",
+  "langchain-chroma>=0.1",
+  "python-dotenv>=1.0",
+  "pyyaml>=6.0",
+]
+graphrag = [
+  "neo4j>=5.0",
+  "langchain>=0.3.0",
+  "langchain-openai>=0.2.0",
+  "langchain-community>=0.3.0",
+  "langchain-text-splitters>=0.3.0",
+  "langgraph>=0.2.0",
+  "openai>=1.0",
+  "pydantic>=2.0",
+  "python-dotenv>=1.0",
+  "pyyaml>=6.0",
+  "pyvis>=0.3.2",
+  "networkx>=3.0",
+  "numpy>=1.24",
+  "loguru>=0.7",
+  "tiktoken>=0.5",
+  "tqdm>=4.65",
+]
+dev = ["jupyterlab>=4.0", "ipykernel>=6.0", "pytest>=8,<10", "nbformat>=5.9,<6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live_neo4j: requires an explicitly configured disposable Neo4j database"]

@@ -1,0 +1,18 @@
+llm_provider: openrouter
+openrouter_provider: openai
+openrouter_model: gpt-4o-mini
+llm_model: gpt-4o-mini
+temperature: 0.2
+max_tokens: 384
+request_timeout: 60
+
+text_emb_provider: sbert
+text_emb_model: sentence-transformers/all-MiniLM-L6-v2
+normalize_embeddings: true
+embedding_device: cpu
+
+clip_model: clip-ViT-B-32
+subset_n: 50
+
+artifacts_root: ./artifacts
+data_root: ./data
