@@ -30,7 +30,7 @@ def test_startup_from_repository_root(tmp_path,monkeypatch,experiment,cell_index
     import experiments.multimodal_retrieval.src.services as mm
     monkeypatch.chdir(ROOT)
     if experiment=='graphrag':
-        path=ROOT/'experiments/graphrag/notebooks/01_knowledge_graph_etl.ipynb'
+        path=ROOT/'experiments/graphrag/notebooks/knowledge_graph_etl.ipynb'
         monkeypatch.setenv('NEO4J_URI','bolt://fixture')
         monkeypatch.setenv('NEO4J_PASSWORD','fixture')
     elif experiment=='multimodal_retrieval':

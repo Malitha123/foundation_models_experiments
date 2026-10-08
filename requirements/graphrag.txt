@@ -22,7 +22,7 @@ pyyaml>=6.0
 pyvis>=0.3.2
 networkx>=3.0
 
-# Vector Operations (for comparison demo)
+# Vector Operations (for comparison path)
 numpy>=1.24
 
 # Utilities

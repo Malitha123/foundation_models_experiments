@@ -10,11 +10,11 @@ cp ../../.env.example .env
 jupyter lab qlora_medical_finetuning.ipynb
 ```
 
-A CUDA GPU is required for the pinned bitsandbytes 4-bit training path. Use Python 3.10 to 3.12. For GPU training, install the PyTorch build that matches the CUDA runtime on the target machine before installing the remaining dependencies. All saved outputs were intentionally cleared before publication. Run the notebook to regenerate outputs for your own environment.
+A CUDA GPU is required for the pinned bitsandbytes 4-bit training path. Use Python 3.10 to 3.12. For GPU training, install the PyTorch build that matches the CUDA runtime on the target machine before installing the remaining dependencies. Generated outputs are excluded from version control. Run the notebook to regenerate results for the target environment.
 
-## Audit note
+## Evaluation note
 
-Evaluation decodes only newly generated token IDs rather than slicing decoded prompt text. This avoids special-token offset errors that can make completions appear truncated. The earlier metric run was invalidated by this bug and is not presented as a final benchmark. Regenerate metrics with the corrected notebook before reporting performance.
+Evaluation decodes only newly generated token IDs rather than slicing decoded prompt text. This avoids special-token offset errors that can make completions appear truncated. Evaluation should be regenerated from the current pipeline before reporting model performance.
 
 ## Current behavior
 
@@ -27,4 +27,4 @@ Evaluation decodes only newly generated token IDs rather than slicing decoded pr
 - The frozen base model and adapter are evaluated on identical prompts. Predictions and settings are saved in `outputs/evaluation.json`.
 - Set `export_merged` and `export_gguf` explicitly to run the optional export stages. Subprocess failures propagate.
 
-The recorded parameter counts describe the earlier run. Deduplication, response masking, and truncation filtering change the training protocol, so new quality metrics must be regenerated.
+The parameter counts describe the configured model and adapter. Deduplication, response masking, and truncation filtering change the training protocol, so new quality metrics must be regenerated.

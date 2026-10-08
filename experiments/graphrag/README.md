@@ -20,13 +20,13 @@ make init-and-seed
 make notebooks
 ```
 
-Start with `notebooks/01_knowledge_graph_etl.ipynb`, then run `notebooks/02_crag_graphrag.ipynb`.
+Start with `notebooks/knowledge_graph_etl.ipynb`, then run `notebooks/corrective_graphrag.ipynb`.
 
 The bundled JSON is a small experiment dataset for graph construction and retrieval testing. It is not a clinical drug-interaction database.
 
 ## Data note
 
-The bundled graph data is a prototype dataset assembled for retrieval engineering. Some interaction records refer to drugs that do not have full metadata entries; the seeding pipeline marks these explicitly as `metadata_status=reference_only` rather than silently treating them as complete records. It contains medical-style relationship text and recommendation fields, but it is not an authoritative pharmacology source and is not suitable for clinical decision-making. Any source labels inside the demonstration passages should be treated as dataset metadata rather than verified citations.
+The bundled graph data is a prototype dataset assembled for retrieval engineering. Some interaction records refer to drugs that do not have full metadata entries; the seeding pipeline marks these explicitly as `metadata_status=reference_only` rather than silently treating them as complete records. It contains medical-style relationship text and recommendation fields, but it is not an authoritative pharmacology source and is not suitable for clinical decision-making. Any source labels inside the synthetic passages should be treated as dataset metadata rather than verified citations.
 
 ## Current implementation
 

@@ -1,4 +1,4 @@
-"""Entity resolution and bounded graph/vector retrieval used by notebook 02."""
+"""Entity resolution and bounded graph/vector retrieval used by the corrective GraphRAG workflow."""
 from __future__ import annotations
 
 from dataclasses import dataclass

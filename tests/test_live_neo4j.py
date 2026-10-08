@@ -21,7 +21,7 @@ def graph():
     with Neo4jClient(URI,'neo4j','test-only') as client:
         assert client.verify_connectivity()
         client.write('MATCH (n) DETACH DELETE n')
-        client.write("CREATE (:QAOnly {name: 'preserved'})")
+        client.write("CREATE (:TestSentinel {name: 'preserved'})")
         dataset=DrugInteractionDataset.model_validate(json.loads((ROOT/'experiments/graphrag/data/raw/drug_interactions.json').read_text()))
         counts=seed_dataset(client,dataset)
         yield client,dataset,counts
@@ -33,7 +33,7 @@ def test_live_schema_seed_and_rerun_preserve_data(graph):
     before=client.get_schema_info()
     ensure_schema(client);seed_dataset(client,dataset)
     assert client.get_schema_info()==before
-    assert client.query("MATCH (n:QAOnly {name:'preserved'}) RETURN count(n) AS count")[0]['count']==1
+    assert client.query("MATCH (n:TestSentinel {name:'preserved'}) RETURN count(n) AS count")[0]['count']==1
     assert client.get_relationship_count('INTERACTS_WITH')==227
     assert client.query('MATCH ()-[r:INTERACTS_WITH]->() RETURN sum(size(r.evidence_records)) AS count')[0]['count']==244
     assert counts['interaction_pairs']==227
@@ -75,14 +75,14 @@ def test_live_etl_notebook_runs_from_repository_root(graph,monkeypatch):
     monkeypatch.delenv('OPENROUTER_API_KEY',raising=False)
     monkeypatch.delenv('OPENAI_API_KEY',raising=False)
     monkeypatch.chdir(ROOT)
-    notebook=json.loads((ROOT/'experiments/graphrag/notebooks/01_knowledge_graph_etl.ipynb').read_text())
+    notebook=json.loads((ROOT/'experiments/graphrag/notebooks/knowledge_graph_etl.ipynb').read_text())
     scope={}
     with redirect_stdout(StringIO()):
         for i,cell in enumerate(notebook['cells']):
             if cell['cell_type']=='code':
                 exec(compile(''.join(cell['source']),f'ETL cell {i}','exec'),scope)
     assert scope['counts']['interaction_pairs']==227
-    assert client.query("MATCH (n:QAOnly {name:'preserved'}) RETURN count(n) AS count")[0]['count']==1
+    assert client.query("MATCH (n:TestSentinel {name:'preserved'}) RETURN count(n) AS count")[0]['count']==1
 
 
 def test_live_crag_notebook_all_cells_with_stubbed_provider_calls(graph,monkeypatch):
@@ -123,7 +123,7 @@ def test_live_crag_notebook_all_cells_with_stubbed_provider_calls(graph,monkeypa
     monkeypatch.setattr(providers,'ChatOpenAI',LLM)
     monkeypatch.setattr(providers,'OpenAIEmbeddings',lambda **kwargs:Embeddings())
     monkeypatch.chdir(ROOT)
-    notebook=json.loads((ROOT/'experiments/graphrag/notebooks/02_crag_graphrag.ipynb').read_text())
+    notebook=json.loads((ROOT/'experiments/graphrag/notebooks/corrective_graphrag.ipynb').read_text())
     scope={}
     with redirect_stdout(StringIO()):
         for i,cell in enumerate(notebook['cells']):

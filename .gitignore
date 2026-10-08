@@ -41,8 +41,5 @@ Thumbs.db
 # Optional source checkout for GGUF export
 experiments/qlora_finetuning/llama.cpp/
 
-# Local-only review and report files
-AUDIT_REPORT.md
-audit-evidence/
-RESULTS.md
-QA_REPORT.md
+# Local-only working notes
+.review/

@@ -1,4 +1,4 @@
-"""Validated and repeatable ingestion of the bundled demonstration data."""
+"""Validated and repeatable ingestion of the bundled synthetic data."""
 
 from __future__ import annotations
 

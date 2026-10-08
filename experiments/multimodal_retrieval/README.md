@@ -14,9 +14,9 @@ cp ../../.env.example .env
 jupyter lab clip_multimodal_retrieval.ipynb
 ```
 
-The LLM portion is optional. CLIP indexing and retrieval run without an LLM API key; only the final retrieval-grounded generation demo is skipped.
+The LLM portion is optional. CLIP indexing and retrieval run without an LLM API key; only the final retrieval-grounded generation is skipped.
 
-## Reruns and edge cases
+## Index and retrieval behavior
 
 Paths are anchored to the configuration file, so starting Jupyter at the repository root works. Images retain their original training indices as IDs. Corrupt images are excluded consistently from both indexes. Reruns prune IDs outside the current subset, and model-specific collection names prevent embedding-dimension collisions. The manifest records both actual collection names.
 

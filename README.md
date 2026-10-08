@@ -1,70 +1,85 @@
-# Foundation Model Fine-Tuning and Advanced GenAI Experiments
+# Foundation Model and GenAI Experiments
 
-1. **Parameter-efficient fine-tuning** of `Qwen/Qwen2.5-1.5B-Instruct` using 4-bit QLoRA on medical instruction data.
-2. **CLIP-based multimodal retrieval** for text-to-image search, text retrieval, score fusion, and retrieval-augmented generation over image metadata.
-3. **Neo4j GraphRAG** for multi-hop reasoning over drugs, conditions, side effects, classes, contraindications, and drug interactions.
+Experiments in parameter-efficient LLM adaptation, multimodal retrieval, and graph-based retrieval-augmented generation.
 
-> The medical examples in this repository are research and engineering experiments only. They are not clinical tools and must not be used for diagnosis, prescribing, treatment decisions, or patient care.
+The repository contains three independent workflows:
 
-## Highlights
+1. QLoRA fine-tuning of `Qwen/Qwen2.5-1.5B-Instruct` on medical instruction data.
+2. CLIP-based text-to-image and multimodal retrieval with ChromaDB.
+3. Neo4j GraphRAG with entity resolution, multi-hop Cypher retrieval, relevance grading, query rewriting, and grounded generation.
 
-- Fine-tuned Qwen2.5-1.5B-Instruct with **4-bit NF4 quantization + LoRA**, training **18,464,768 of 1,562,179,072 parameters (1.182%)**.
-- Used Hugging Face Transformers, PEFT, TRL, bitsandbytes, and supervised fine-tuning on a sampled medical instruction dataset.
-- Evaluated the adapted model with **ROUGE-L** and an **LLM-as-a-Judge** workflow, then ran targeted safety red-team prompts and investigated response-quality, decoding, and unsafe-output failure modes.
-- Built **CLIP text-to-image retrieval** with ChromaDB-backed text and image indexes plus weighted score fusion.
-- Built a **Neo4j/Cypher knowledge graph** and a LangGraph Corrective RAG workflow with entity resolution, multi-hop retrieval, relevance grading, query rewriting, and grounded answer generation.
+Medical content in this repository is used for engineering experiments only. It is not a clinical decision-support system.
 
-## Repository layout
+## Repository structure
 
 ```text
 foundation-model-genai-experiments/
 ├── experiments/
 │   ├── qlora_finetuning/
-│   │   └── qlora_medical_finetuning.ipynb
+│   │   ├── qlora_medical_finetuning.ipynb
+│   │   └── src/
 │   ├── multimodal_retrieval/
 │   │   ├── clip_multimodal_retrieval.ipynb
 │   │   ├── config.yaml
-│   │   └── src/services.py
+│   │   └── src/
 │   └── graphrag/
-│       ├── config/
-│       ├── data/raw/drug_interactions.json
 │       ├── notebooks/
+│       │   ├── knowledge_graph_etl.ipynb
+│       │   └── corrective_graphrag.ipynb
+│       ├── config/
+│       ├── data/
 │       ├── scripts/
 │       └── src/graphrag/
 ├── requirements/
-├── .env.example
-└── Makefile
+├── tests/
+├── Makefile
+└── pyproject.toml
 ```
 
-## 1. QLoRA fine-tuning
+## QLoRA fine-tuning
 
-The fine-tuning experiment adapts `Qwen/Qwen2.5-1.5B-Instruct` with a 4-bit QLoRA configuration. The notebook covers dataset mapping, token-length diagnostics, baseline inference, adapter training, post-tuning inference, evaluation, safety testing, adapter packaging, and optional GGUF export.
+The fine-tuning workflow uses 4-bit NF4 quantization with LoRA adapters and supervised fine-tuning. It includes data normalization, sequence-length diagnostics, response-only loss masking, baseline and adapted-model inference, ROUGE-L evaluation, optional LLM-based judging, safety probes, adapter packaging, and optional merged-weight export.
 
 ```bash
-pip install -r requirements/finetuning.txt
+python -m pip install -r requirements/finetuning.txt
 cd experiments/qlora_finetuning
 cp ../../.env.example .env
 jupyter lab qlora_medical_finetuning.ipynb
 ```
 
-The default experiment loads up to 500 examples from `lavita/AlpaCare-MedInstruct-52k`. Blank and duplicate examples are removed, and prompt groups are split approximately 90/10 so the same question cannot leak across train and validation sets. CUDA is required for the pinned 4-bit path. Training masks prompt tokens and filters examples whose responses would be entirely truncated. Evaluation compares the frozen base model and adapter on the same held-out prompts and saves `outputs/evaluation.json`. Publishing and merged/GGUF exports are disabled by default.
+Configured training parameters:
 
-## 2. Multimodal retrieval with CLIP
+| Setting | Value |
+|---|---|
+| Base model | `Qwen/Qwen2.5-1.5B-Instruct` |
+| Quantization | 4-bit NF4 with double quantization |
+| LoRA rank / alpha | 16 / 32 |
+| Target modules | q/k/v/o projections and gate/up/down projections |
+| Trainable parameters | 18,464,768 |
+| Total parameters | 1,562,179,072 |
+| Maximum sequence length | 512 |
+| Maximum training steps | 250 |
 
-The multimodal experiment encodes dermatology images with CLIP, creates a text index and an image index, supports text-only and text-to-image retrieval, and combines both rankings with weighted fusion.
+CUDA is required for the pinned 4-bit training path. Publishing and merged/GGUF export are opt-in.
+
+## Multimodal retrieval
+
+The multimodal workflow creates separate text and image indexes, supports text-only and text-to-image retrieval, and combines result sets using weighted score fusion.
 
 ```bash
-pip install -r requirements/multimodal.txt
+python -m pip install -r requirements/multimodal.txt
 cd experiments/multimodal_retrieval
 cp ../../.env.example .env
 jupyter lab clip_multimodal_retrieval.ipynb
 ```
 
-The notebook expects `data/dermamnist_128.npz`. Download DermaMNIST from its official MedMNIST/Zenodo distribution and place the file there before running the image indexing cells. Dataset files are intentionally not bundled. Item IDs use the original training-image indices. Both indexes upsert current items and prune stale IDs, and separate collection names prevent mixing different embedding models. Cosine distance and normalized CLIP vectors are used consistently. Empty results and invalid search parameters are handled explicitly.
+The workflow expects `data/dermamnist_128.npz`, downloaded separately from the official MedMNIST/Zenodo distribution. Dataset files are not committed to the repository.
 
-## 3. Neo4j GraphRAG
+Collection names include embedding-model identity, reruns prune stale IDs, and image IDs preserve the source dataset indices. Retrieval handles empty results and invalid search parameters explicitly.
 
-The GraphRAG experiment models a drug-interaction domain using four primary node types and five relationship types:
+## Neo4j GraphRAG
+
+The graph workflow models drugs, conditions, side effects, contraindications, classes, and drug interactions.
 
 ```text
 (:Drug)-[:INTERACTS_WITH]->(:Drug)
@@ -74,55 +89,56 @@ The GraphRAG experiment models a drug-interaction domain using four primary node
 (:Drug)-[:BELONGS_TO_CLASS]->(:DrugClass)
 ```
 
-The retrieval workflow resolves entities from natural-language questions, traverses one-hop and multi-hop relationships, grades retrieved context, rewrites weak queries, and generates an answer grounded in graph context.
-
 ```mermaid
 flowchart LR
-    Q[Question] --> R[Route]
-    R --> E[Extract + resolve entities]
+    Q[Question] --> E[Extract and resolve entities]
     E --> G[Neo4j / Cypher retrieval]
-    G --> C{Relevant context?}
-    C -->|yes| A[Grounded answer]
-    C -->|no| W[Rewrite query]
+    G --> R{Relevant context?}
+    R -->|yes| A[Grounded answer]
+    R -->|no| W[Rewrite query]
     W --> E
-    C -->|retry limit| N[Insufficient evidence]
+    R -->|retry limit| N[Insufficient evidence]
 ```
 
 Setup:
 
 ```bash
-pip install -r requirements/graphrag.txt
+python -m pip install -r requirements/graphrag.txt
 cd experiments/graphrag
 cp ../../.env.example .env
 make init-and-seed
 jupyter lab notebooks/
 ```
 
-## Configuration and secrets
+The bundled graph data is synthetic and intended for retrieval engineering. It is not an authoritative pharmacology source.
 
-Copy `.env.example` to the experiment directory you are running. Never commit real credentials.
+## Configuration
+
+Copy `.env.example` into the experiment directory being run. Credentials are read from environment variables for Hugging Face, Gemini/Google, OpenRouter/OpenAI, and Neo4j.
+
+Generated model weights, adapters, Chroma databases, downloaded datasets, and local Neo4j state are excluded from version control.
+
+## Tests
 
 ```bash
-cp .env.example .env
+python -m pip install -r requirements/test.txt
+python -m pytest -q
 ```
 
-The repository is configured to read secrets from environment variables, including Hugging Face, Gemini/Google, OpenRouter/OpenAI, and Neo4j credentials.
+Live Neo4j checks require an explicitly disposable database:
 
-## Reproducing the recorded experiment
+```bash
+GRAPHRAG_TEST_URI=bolt://localhost:7687 \
+GRAPHRAG_TEST_ALLOW_CLEAR=1 \
+python -m pytest -q tests/test_live_neo4j.py
+```
 
-The original recorded fine-tuning run used:
+GPU training, paid provider calls, and live external services depend on the target environment and credentials.
 
-| Setting | Value |
-|---|---|
-| Base model | `Qwen/Qwen2.5-1.5B-Instruct` |
-| Quantization | 4-bit NF4, double quantization |
-| LoRA rank / alpha | 16 / 32 |
-| Target modules | q/k/v/o projections + gate/up/down projections |
-| Trainable parameters | 18,464,768 |
-| Total parameters | 1,562,179,072 |
-| Trainable share | 1.182% |
-| Dataset sample | 500 examples |
-| Train / validation | 450 / 50 |
-| Maximum sequence length | 512 |
-| Maximum training steps | 250 |
+## Experiment notes
 
+- QLoRA evaluation compares the frozen base model and adapter on the same held-out prompts.
+- Multimodal indexes use consistent cosine distance and normalized CLIP image vectors.
+- Graph retrieval resolves exact aliases before fuzzy and semantic matching.
+- Corrective GraphRAG replaces stale context on each retry and returns an explicit insufficient-evidence response after the retry limit.
+- External model and dataset licenses remain governed by their respective providers.

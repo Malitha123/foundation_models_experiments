@@ -2,7 +2,6 @@
 name = "foundation-model-genai-experiments"
 version = "0.1.0"
 description = "Independent experiments in QLoRA fine-tuning, multimodal retrieval, and Neo4j GraphRAG"
-authors = [{ name = "Malitha Gunawardhana" }]
 readme = "README.md"
 requires-python = ">=3.10"
 

@@ -1,4 +1,4 @@
-"""Seed the demonstration graph. Database deletion requires --clean-first."""
+"""Seed the synthetic graph. Database deletion requires --clean-first."""
 import argparse
 import json
 import sys
